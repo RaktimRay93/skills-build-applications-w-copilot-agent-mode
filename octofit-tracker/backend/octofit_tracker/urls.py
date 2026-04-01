@@ -15,7 +15,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.http import JsonResponse
+import os
+
+def api_root(request):
+    codespace_name = os.environ.get('CODESPACE_NAME', 'localhost')
+    api_url = f"https://{codespace_name}-8000.app.github.dev/api/" if codespace_name != 'localhost' else "http://localhost:8000/api/"
+    response = JsonResponse({"api_root": api_url})
+    response["Allow"] = "GET"
+    response["Vary"] = "Accept, Origin"
+    return response
 
 urlpatterns = [
+    path('', api_root),
     path('admin/', admin.site.urls),
+    path('api/', api_root),
 ]
